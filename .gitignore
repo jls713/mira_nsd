@@ -1,3 +1,12 @@
+*.csv
+*.vot
+*.pdf
+*.png
+*.agama
+*.pkl
+*.dat
+*.npy
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
