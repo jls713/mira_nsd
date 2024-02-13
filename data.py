@@ -90,22 +90,29 @@ def load_mira_sample(lowb = False,
         data['epmb'] *= 1.1
 
     fltr = [True]*len(data)
+    print(np.count_nonzero(fltr))
     if reliable:
         fltr &= (data['unreliable']==0)
+        print(np.count_nonzero(fltr), np.count_nonzero(~(data['unreliable']==0)))
 
     if high_amp:
         fltr &= (data['amplitude']>0.4)
+        print(np.count_nonzero(fltr), np.count_nonzero(~(data['amplitude']>0.4)))
 
     if sig_clip is not None:
         for compt in ['l','b']:
-            fltr &= (data['pm%s'%compt]==data['pm%s'%compt])
-            fltr &= (np.abs(data['pm%s'%compt]-np.nanmedian(data['pm%s'%compt]))<np.nanstd(data['pm%s'%compt].values)*sig_clip)
+            fltr_PM = (data['pm%s'%compt]==data['pm%s'%compt])
+            fltr_PM &= (np.abs(data['pm%s'%compt]-np.nanmedian(data['pm%s'%compt]))<np.nanstd(data['pm%s'%compt].values)*sig_clip)
+            fltr &= fltr_PM
+        print(np.count_nonzero(fltr), np.count_nonzero(~fltr_PM))
 
     if lowb:
-        fltr &= (np.abs(data['b'])<0.4)
+        fltr &= (np.abs(data['b'])<0.4)        
+        print(np.count_nonzero(fltr), np.count_nonzero(~(np.abs(data['b'])<0.4)))
 
     if per_cut is not None:
-        fltr &= (data['period']>per_cut[0])&(data['period']<per_cut[1])
+        fltr &= (data['period']>per_cut[0])&(data['period']<per_cut[1])   
+        print(np.count_nonzero(fltr), np.count_nonzero(~((data['period']>per_cut[0])&(data['period']<per_cut[1]))))
     
     data['joint_rv'] = data['maser_SiO_rv'].values.copy()
     data.loc[data['joint_rv']!=data['joint_rv'], 'joint_rv'] = data['maser_OH_rv'].values[data['joint_rv']!=data['joint_rv']]

@@ -40,15 +40,18 @@ class Portail_interp(Portail):
                  gc_dist=8.275,
                  gc_vel=(11.1, 6.411*4.74*8.275, 7.25),
                  bw_scale=0.5,
-                 parallel=False):
+                 parallel=False,
+                 cut_radius=15.,
+                 use_vtransverse=False):
         
         super(Portail_interp, self).__init__()
-        self.cut_stuff()
+        self.cut_stuff(cut_radius=cut_radius)
         self.symmetrise()
         self.realign()
 
         self.include_vlos = include_vlos
         self.include_distance = include_distance
+        self.use_vtransverse = use_vtransverse
         self.bw_scale = bw_scale
 
         lrange = np.deg2rad(lrange_degree)
@@ -64,6 +67,11 @@ class Portail_interp(Portail):
                                                               galcen_distance=gc_dist,
                                                               galcen_v_sun=gc_vel)).T
         
+        if self.use_vtransverse:
+            if not include_distance:
+                raise ValueError('Cannot include transverse velocities without including distance')
+            self.lbr[:,3:5] *= self.lbr[:,2][:,None]
+
         self.lshift = shift_sgrA[1]/gc_dist
         self.bshift = shift_sgrA[2]/gc_dist
 
@@ -141,6 +149,9 @@ class Portail_interp(Portail):
         Lcoords = np.deg2rad(Lcoords - 360.*(Lcoords>180.)) - self.lshift
         Bcoords = np.deg2rad(Bcoords) - self.bshift
         
+        if self.use_vtransverse:
+            Vcoords[:,1:] *= Vcoords[:,0][:,None]
+        
         gg=np.reshape([self.pft[i](Vcoords) for i in range(len(self.pft))], 
                       (*self.lbgrid[0].shape,len(Vcoords)))
         
@@ -160,7 +171,10 @@ class Portail_interp(Portail):
                 gg[ll+1,bb,ar]*delta_l*(1-delta_b) + \
                 gg[ll,bb+1,ar]*(1-delta_l)*delta_b + \
                 gg[ll+1,bb+1,ar]*delta_l*delta_b
-            
+        
+        if self.use_vtransverse:
+            inT *= Vcoords[:,0]**2
+
         if return_density:
             return inT, self.dens[ll  ,bb  ]*(1-delta_l)*(1-delta_b) + \
                         self.dens[ll+1,bb  ]*   delta_l *(1-delta_b) + \

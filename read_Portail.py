@@ -53,15 +53,15 @@ class Portail(object):
     # cut useless stuff
     ############################## 
 
-    def cut_stuff(self):
+    def cut_stuff(self, cut_radius=15.):
         """
-        removes particles outside of 8 kpc
+        removes particles outside of cut_radius kpc
         """
         x_cm = (self.x*self.m).sum()/self.m.sum()
         y_cm = (self.y*self.m).sum()/self.m.sum()
         z_cm = (self.z*self.m).sum()/self.m.sum()
 
-        COND = (np.sqrt((self.x-x_cm)**2 + (self.y-y_cm)**2 + (self.z-z_cm)**2)<8) & (self.Cstars)
+        COND = (np.sqrt((self.x-x_cm)**2 + (self.y-y_cm)**2 + (self.z-z_cm)**2)<cut_radius) & (self.Cstars)
 
         self.m    = self.m[COND]  
         self.x    = self.x[COND]  

@@ -109,11 +109,11 @@ class selection_function(object):
 
     The selection function is a function of the Galactic longitude, latitude, distance and period.
     """
-    def __init__(self, plr=plr, width=None, data_file=None):
-        self.AK_EHK = 1.306
+    def __init__(self, plr=plr, width=None, data_file=None, ext_multiplier=1., high_cut_off = 20.,
+                 ext_map=schultheis_map_3d):
+        self.AK_EHK = 1.306*ext_multiplier
         self.C = convolution_interp()
-        self.smap = schultheis_map_3d()
-        high_cut_off = 20.
+        self.smap = ext_map()
         self.Sk = lambda k,P: .5*(1.-np.tanh((10.3-k)/.4))*.9*.5*(1.-np.tanh((k-high_cut_off)/.2))
         if data_file is not None:
             s = pd.read_csv(data_file)

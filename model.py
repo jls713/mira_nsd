@@ -693,6 +693,9 @@ def generate_samples(model,
                                     np.random.uniform(2.,3.,np.count_nonzero(fltr)),
                                     np.ones(np.count_nonzero(fltr))]).T
         
+        if bar_model.use_vtransverse:
+            bar_samples[:,3:5] /= bar_samples[:,2:3]
+        
         samples = np.vstack([samples.T, np.zeros(len(samples))]).T # add identifiers
         joint_samples = np.vstack([samples, bar_samples])
 
