@@ -74,6 +74,8 @@ def load_mira_sample(lowb = False,
         data[field + '_rc2all'] = updated_crossmatch[field]
 
     data = ml_mb(data)
+    
+    data.to_csv('final_nsd_mira_full_cols_updated_proper_motions.csv')
 
     data['l_rad'], data['b_rad'] = np.deg2rad(data['l']), np.deg2rad(data['b'])
 
@@ -248,3 +250,7 @@ def add_spitzer_phot(tbl,radeccols=['ra', 'dec']):
         tbl.loc[tbl[c]!=tbl[c],c]=tbl[c+'_glimpse'][tbl[c]!=tbl[c]]
 
     return tbl
+
+if __name__=="__main__":
+    data = load_mira_sample()
+
